@@ -29,17 +29,17 @@ const menuItems = [
     },
     {
         title: "Schedules",
-        path: "/dashboard",
+        path: "/dashboard/Scheduler-Page",
         icon: <MdSchedule />,
     },
     {
         title: "Statistics",
-        path: "/dashboard",
+        path: "/dashboard/Statistics",
         icon: <IoIosStats />,
     },
     {
         title: "Mood & Energy",
-        path: "/dashboard",
+        path: "/dashboard/Mood-Page",
         icon: <FaHeart />,
     },
     {
