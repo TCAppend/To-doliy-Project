@@ -1,7 +1,14 @@
 @import "tailwindcss";
+@plugin "daisyui";
 
 body {
   background: #FEF3E2;
   color: var(--foreground);
   font-family: poppins, sans-serif;
+}
+
+a {
+  color: black;
+  text-decoration: none;
+
 }
