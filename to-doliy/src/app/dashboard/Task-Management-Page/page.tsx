@@ -1,230 +1,276 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { GoKebabHorizontal } from "react-icons/go"
+import { GoKebabHorizontal } from "react-icons/go";
 
 interface Task {
-    id: number;
-    name: string;
-    description: string;
-    isCompleted: boolean;
-    expDate: string; // Stored as string
-    dateCreated: string; // Stored as string
-    priority: 'Low' | 'Medium' | 'High';
+  id: number;
+  name: string;
+  description: string;
+  isCompleted: boolean;
+  expDate: string;
+  dateCreated: string;
+  priority: 'Low' | 'Medium' | 'High';
 }
 
 export default function Task_Management() {
-    const [tasks, setTasks] = useState<Task[]>([]);
-    const [isLoaded, setIsLoaded] = useState(false); // 👈 Added flag
-    const [newTask, setNewTask] = useState({
-        name: '',
-        description: '',
-        expDate: '',
-        priority: 'Medium' as 'Low' | 'Medium' | 'High',
-    });
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [newTask, setNewTask] = useState({
+    name: '',
+    description: '',
+    expDate: '',
+    priority: 'Medium' as 'Low' | 'Medium' | 'High',
+  });
 
-    const deleteTask = (id: number) => {
-  setTasks(prev => prev.filter(task => task.id !== id));
+  const deleteTask = (id: number) => {
+    setTasks(prev => prev.filter(task => task.id !== id));
+  };
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('tasks');
+      if (stored) setTasks(JSON.parse(stored));
+      setIsLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+  }, [tasks, isLoaded]);
+
+  const toggleTask = (id: number) => {
+    setTasks(prev =>
+      prev.map(task =>
+        task.id === id ? { ...task, isCompleted: !task.isCompleted } : task
+      )
+    );
+  };
+
+  const addTask = (e: React.FormEvent) => {
+    e.preventDefault();
+    const newEntry: Task = {
+      id: Date.now(),
+      name: newTask.name,
+      description: newTask.description,
+      isCompleted: false,
+      expDate: newTask.expDate,
+      dateCreated: new Date().toISOString(),
+      priority: newTask.priority,
+    };
+    setTasks(prev => [...prev, newEntry]);
+    setNewTask({ name: '', description: '', expDate: '', priority: 'Medium' });
+  };
+
+  
+
+const priorityOrder: Record<'High' | 'Medium' | 'Low', number> = {
+  High: 1,
+  Medium: 2,
+  Low: 3
 };
 
-    // ✅ Load tasks from localStorage on mount
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const stored = localStorage.getItem('tasks');
-            if (stored) {
-                setTasks(JSON.parse(stored));
-            }
-            setIsLoaded(true); // 👈 After loading
-        }
-    }, []);
+const groupTasksByDate = () => {
+  const groups: { [date: string]: Task[] } = {};
 
-    // ✅ Save tasks to localStorage on update
-    useEffect(() => {
-        if (isLoaded) {
-            localStorage.setItem('tasks', JSON.stringify(tasks));
-        }
-    }, [tasks, isLoaded]);
+  tasks.forEach(task => {
+    if (!groups[task.expDate]) groups[task.expDate] = [];
+    groups[task.expDate].push(task);
+  });
 
-    const toggleTask = (id: number) => {
-        setTasks(prev =>
-            prev.map(task =>
-                task.id === id ? { ...task, isCompleted: !task.isCompleted } : task
-            )
-        );
-    };
+  const sortedDates = Object.keys(groups).sort((a, b) => {
+    return new Date(b).getTime() - new Date(a).getTime(); // newest first
+  });
 
-    const addTask = (e: React.FormEvent) => {
-        e.preventDefault();
-        const newEntry: Task = {
-            id: Date.now(),
-            name: newTask.name,
-            description: newTask.description,
-            isCompleted: false,
-            expDate: newTask.expDate,
-            dateCreated: new Date().toISOString(),
-            priority: newTask.priority,
-        };
-        setTasks(prev => [...prev, newEntry]);
-        setNewTask({ name: '', description: '', expDate: '', priority: 'Medium' });
-    };
+  return sortedDates.map(date => ({
+    date,
+    tasks: groups[date].sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority])
+  }));
+};
+// Label each date
+const getDateLabel = (dateStr: string) => {
+  const today = new Date();
+  const tomorrow = new Date();
+  tomorrow.setDate(today.getDate() + 1);
 
-    if (!isLoaded) return null;
+  const date = new Date(dateStr);
 
-    
+  if (date.toDateString() === today.toDateString()) return 'Today';
+  if (date.toDateString() === tomorrow.toDateString()) return 'Tomorrow';
 
-    return (
-<>
+  return date.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric'
+  });
+};
 
-        {/* Modal Here */}
-        
+
+  if (!isLoaded) return null;
+
+  return (
+    <>
+      {/* Modal */}
 <dialog id="my_modal_1" className="modal">
   <div className="modal-box bg-[#F9D965]">
-    <h3 className="font-bold text-lg">Add task</h3>
-    <div className="">
+    <h3 className="font-bold text-lg mb-4">Add Task</h3>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        addTask(e);
+        (document.getElementById('my_modal_1') as HTMLDialogElement)?.close();
+      }}
+      className="grid grid-cols-1 gap-4"
+    >
+      <input
+        type="text"
+        maxLength={30}
+        placeholder="Task name"
+        value={newTask.name}
+        onChange={(e) => setNewTask({ ...newTask, name: e.target.value })}
+        required
+        className="border p-2 rounded-lg"
+      />
+      <textarea
+        placeholder="Description"
+        value={newTask.description}
+        onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+        required
+        className="border p-2 rounded-lg h-28 resize-none"
+      />
+      <input
+        type="date"
+        value={newTask.expDate}
+        onChange={(e) => setNewTask({ ...newTask, expDate: e.target.value })}
+        required
+        className="border p-2 rounded-lg"
+      />
+      <select
+        value={newTask.priority}
+        onChange={(e) =>
+          setNewTask({ ...newTask, priority: e.target.value as 'Low' | 'Medium' | 'High' })
+        }
+        className="border p-2 rounded-lg"
+      >
+        <option value="Low">Low Priority</option>
+        <option value="Medium">Medium Priority</option>
+        <option value="High">High Priority</option>
+      </select>
 
-            <form onSubmit={addTask} className="mb-4 grid grid-cols-1 gap-4">
-                <input
-                    type="text"
-                    placeholder="Task name"
-                    value={newTask.name}
-                    onChange={(e) => setNewTask({ ...newTask, name: e.target.value })}
-                    required
-                    className="border p-2 rounded-lg"
-                />
-                <input
-                    type="text"
-                    placeholder="Description"
-                    value={newTask.description}
-                    onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
-                    required
-                    className="border p-2 rounded-lg "
-                />
-                <input
-                    type="date"
-                    value={newTask.expDate}
-                    onChange={(e) => setNewTask({ ...newTask, expDate: e.target.value })}
-                    required
-                    className="border p-2 rounded-lg "
-                />
-                <select
-                    value={newTask.priority}
-                    onChange={(e) =>
-                        setNewTask({ ...newTask, priority: e.target.value as 'Low' | 'Medium' | 'High' })
-                    }
-                    className="border p-2 rounded-lg "
-                >
-                    <option value="Low">Low Priority</option>
-                    <option value="Medium">Medium Priority</option>
-                    <option value="High">High Priority</option>
-                </select>
-                <div>
-                    
-                </div>
-               <div className='flex justify-end mt-4 gap-1'>
-                     <button type="submit" className="btn bg-green-600  text-white px-4 py-2 rounded-lg">
-                    Add Task
-                </button>
-            
-        
-               </div>
-                
-            </form>
-           <form method="dialog">
-        {/* if there is a button in form, it will close the modal */}
-        <button className="-mt-24 btn bg-red-700 px-4 py-2 rounded-lg text-white">Cancel</button>
-      </form>
-
-        </div>
-      
-             
-    </div>
-
+      {/* Buttons aligned */}
+      <div className="flex justify-end gap-2 mt-4">
+        <button
+          type="button"
+          className="btn bg-red-700 px-4 py-2 rounded-lg text-white"
+          onClick={() => (document.getElementById('my_modal_1') as HTMLDialogElement)?.close()}
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          className="btn bg-green-600 text-white px-4 py-2 rounded-lg"
+        >
+          Add Task
+        </button>
+      </div>
+    </form>
+  </div>
 </dialog>
 
 
-        <div className="p-4 text-black">
-            
-            <div className="bg-[#F9D965] p-4 rounded-3xl">
-                <p className="p-4 text-4xl">Today: {tasks.length} available task(s)</p>
-                <div className="space-y-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-                    {tasks.map((task) => (
-                        <div key={task.id} className="flex flex-col p-2 rounded-lg bg-[#FCFF58] w-full">
+      {/* Main task list */}
+<div className="p-4 text-black">
+  <div className="bg-[#F9D965] p-4 rounded-3xl">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-2">
+      <p className="text-2xl sm:text-4xl font-semibold">
+        Today: {
+          tasks.filter(task => {
+            const today = new Date();
+            const taskDate = new Date(task.expDate);
+            return taskDate.toDateString() === today.toDateString();
+          }).length
+        } available task(s)
+      </p>
 
-                            <div className="flex-1">
-                                <div className="flex justify-between items-center">
-                                    <h3 className={`text-lg ${task.isCompleted ? 'line-through' : ''}`}>
-                                        {task.name}
-                                    </h3>
-                                    <div className='flex items-center gap-2'>
-                                        <input
-                                        type="checkbox"
-                                        checked={task.isCompleted}
-                                        onChange={() => toggleTask(task.id)}
-                                        className="ml-4"
-                                    />
-                                    
-                                    {/* Delete dropdown (might add more) */}
-                                   <details className="dropdown">
-  <summary className="btn shadow-[#FCFF58] shadow-2xl border-[#FCFF58] bg-[#FCFF58] text-black text-xl z-1 w-9 p-2">
-    <GoKebabHorizontal />
-  </summary>
-  <ul className="menu dropdown-content rounded-box z-1 w-52 p-2 bg-white shadow-lg">
-    <li>
       <button
-        onClick={() => deleteTask(task.id)}
-        className="hover:bg-red-600 hover:text-white w-full text-left px-4 py-2"
+        onClick={() =>
+          (document.getElementById('my_modal_1') as HTMLDialogElement)?.showModal()
+        }
+        className="btn rounded-full bg-[#F3C623] px-3 sm:px-4 py-2 text-lg sm:text-xl hover:bg-[#FCFF58] border-none text-black shadow-md transition-colors duration-200"
       >
-        Delete
+        <span className="text-xl font-bold">+</span>
+        <span className="hidden sm:inline ml-1">Add Task</span>
       </button>
-    </li>
-  </ul>
-</details>
+    </div>
 
-                                    
-                                    </div>
-                                    
-                                </div> 
+    <div className="space-y-8 mt-4 font-bold">
+      {groupTasksByDate().map(({ date, tasks }) => (
+        <div key={date}>
+          <h2 className="text-xl sm:text-2xl font-bold mb-2">{getDateLabel(date)}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {tasks.map((task) => (
+              <div
+                key={task.id}
+                className="flex flex-col p-2 rounded-lg bg-[#FCFF58] shadow-black/50 shadow-md w-full h-auto min-h-[13rem]"
+              >
+                <div className="flex-1">
+                  <div className="flex justify-between items-start gap-2">
+                    <h3
+                      className={`text-base sm:text-lg ${task.isCompleted ? 'line-through decoration-2' : ''}`}
+                    >
+                      {task.name}
+                    </h3>
 
-                                <p className="text-base text-center px-2 py-1 break-words justify-items-center">{task.description}</p>      
-                            </div>
-                            <div className="flex justify-between items-center mt-2 flex-wrap gap-2 text-sm">
-                                    <p>Due: {new Date(task.expDate).toLocaleDateString()}</p>
-                                    <span
-                                                className={`px-2 py-1 rounded-full text-white text-xs font-semibold
-                                                    ${
-                                                    task.priority === 'High'
-                                                        ? 'bg-red-600'
-                                                        : task.priority === 'Medium'
-                                                        ? 'bg-yellow-500 text-black'
-                                                        : 'bg-green-600'
-                                                    }`}
-                                                >
-                                                {task.priority}
-                                                </span>
-
-                                </div>
-                        </div>
-                    ))}
-
-                    <button onClick={() =>
-    (document.getElementById('my_modal_1') as HTMLDialogElement)?.showModal()
-  }>
-                <div className="items-center p-4 border rounded-lg bg-[#F9D965] hover:bg-[#FCFF58] transition-colors duration-300">
-                            <div className="text-center">
-                                    <h3 className="text-4xl mb-2">
-                                        +
-                                    </h3>
-                                    <h3 className='text-2xl mb-2'>
-                                        Add what to do
-                                    </h3>
-                            </div>
-                        </div>
-
-                    </button>
-                   
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={task.isCompleted}
+                        onChange={() => toggleTask(task.id)}
+                        className="ml-2 checkbox border-black bg-[#FCFF58] shadow-[#FCFF58] shadow-2xl text-black"
+                      />
+                      <details className="dropdown">
+                        <summary className="btn border-[#FCFF58] bg-[#FCFF58] shadow-[#FCFF58] shadow-2xl text-black text-lg sm:text-xl w-8 sm:w-9 p-1 sm:p-2">
+                          <GoKebabHorizontal />
+                        </summary>
+                        <ul className="menu dropdown-content rounded-box w-44 sm:w-52 p-2 bg-white">
+                          <li>
+                            <button
+                              onClick={() => deleteTask(task.id)}
+                              className="hover:bg-red-600 hover:text-white w-full text-left px-4 py-2"
+                            >
+                              Delete
+                            </button>
+                          </li>
+                        </ul>
+                      </details>
+                    </div>
+                  </div>
+                  <p className="text-sm sm:text-base text-center p-4 break-words">{task.description}</p>
                 </div>
-            </div>
+
+                <div className="flex justify-between items-center mt-2 flex-wrap gap-2 text-xs sm:text-sm">
+                  <p>Due: {new Date(task.expDate).toLocaleDateString()}</p>
+                  <span
+                    className={`px-2 py-1 rounded-full text-white text-[0.7rem] sm:text-xs font-semibold
+                      ${task.priority === 'High'
+                        ? 'bg-red-600'
+                        : task.priority === 'Medium'
+                        ? 'bg-yellow-500 text-black'
+                        : 'bg-green-600'
+                      }`}
+                  >
+                    {task.priority}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-</>
-        
-    );
+      ))}
+    </div>
+  </div>
+</div>
+    </>
+  );
 }

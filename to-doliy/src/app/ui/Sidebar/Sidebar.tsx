@@ -50,9 +50,9 @@ const menuItems = [
 ]
     return (
         <div className="p-4 bg-[#F9D965] rounded-3xl h-full flex flex-col justify-between">
-            <div className="mb-4 font-bold text-3xl">To-doliy:</div>
+            <p className="mb-4 font-bold text-3xl text-shadow-lg shadow-black">To-doliy:</p>
             {/* Menu Items */}
-            <div className="flex flex-col gap-1 text-2xl">
+            <div className="flex flex-col gap-1 text-2xl font-light">
             {menuItems.map((item, index) => (
                 <Link href={item.path} key={index} className="flex items-center text-black gap-2 p-2 rounded-lg hover:bg-[#ffe9b3] transition-colors duration-200">
                 {item.icon}

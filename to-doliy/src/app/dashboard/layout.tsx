@@ -7,7 +7,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex h-screen text-black">
+    <div className="flex h-screen text-black bg-[#FEF3E2]">
       <div className="p-2 ">
         <Sidebar />
       </div>
