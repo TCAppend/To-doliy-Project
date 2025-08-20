@@ -203,7 +203,8 @@ const getDateLabel = (dateStr: string) => {
         <span className="hidden sm:inline ml-1">Add Task</span>
       </button>
     </div>
-
+    
+        {/* Task list grouped by date */}
     <div className="space-y-8 mt-4 font-bold">
       {groupTasksByDate().map(({ date, tasks }) => (
         <div key={date}>

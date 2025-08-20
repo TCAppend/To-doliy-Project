@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@hello-pangea/dnd": "^18.0.1",
     "daisyui": "^5.0.50",
     "next": "^15.4.4",
     "react": "^19.0.0",
