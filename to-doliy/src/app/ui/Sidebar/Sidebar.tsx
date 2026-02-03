@@ -33,14 +33,14 @@ const menuItems = [
         icon: <MdSchedule />,
     },
     {
+        title: "Mood & Journaling",
+        path: "/dashboard/Mood-Page",
+        icon: <FaHeart />,
+    },
+    {
         title: "Statistics",
         path: "/dashboard/Statistics",
         icon: <IoIosStats />,
-    },
-    {
-        title: "Mood & Energy",
-        path: "/dashboard/Mood-Page",
-        icon: <FaHeart />,
     },
     {
         title: "Settings",
