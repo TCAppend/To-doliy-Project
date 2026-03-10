@@ -177,12 +177,12 @@ export default function Time_Logger() {
       </dialog>
 
       {/* Top Page */}
-      <div className="p-4 text-black">
-        <div className="bg-[#F9D965] p-4 rounded-3xl">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-2 ">
-            <p className="text-2xl sm:text-4xl font-semibold ">
+
+        <div className="bg-[#F9D965] p-2 rounded-3xl">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-2 ">
+            <h1 className=" text-2xl font-semibold ">
               Today: {logs.length} Log(s) available
-            </p>
+            </h1>
             <button
               onClick={() =>
                 (document.getElementById('my_modal_1') as HTMLDialogElement)?.showModal()
@@ -194,12 +194,11 @@ export default function Time_Logger() {
             </button>
           </div>
         </div>
-      </div>
+
 
       {/* Body Page */}
-      <div className="p-4 text-black">
-        <div className="bg-[#F9D965] p-4 rounded-3xl">
-          <div className="overflow-x-auto">
+        <div className="pt-4 ">
+          <div className=" bg-[#F9D965] p-4  rounded-3xl text-black overflow-x-auto">
             <DragDropContext onDragEnd={handleDragEnd}>
               <Droppable droppableId="logs">
                 {(provided) => (
@@ -266,7 +265,7 @@ export default function Time_Logger() {
           {/* Categories placeholder */}
           <div className="flex mt-4 border-t-2 p-3">Categories (drag rows ↑)</div>
         </div>
-      </div>
+
     </>
   );
 }

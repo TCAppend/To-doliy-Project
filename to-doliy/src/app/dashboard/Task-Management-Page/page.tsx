@@ -180,10 +180,9 @@ const getDateLabel = (dateStr: string) => {
 
 
       {/* Main task list */}
-<div className="p-4 text-black">
-  <div className="bg-[#F9D965] p-4 rounded-3xl">
+<div className="bg-[#F9D965] p-4 rounded-3xl text-black">
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-2">
-      <p className="text-2xl sm:text-4xl font-semibold">
+      <p className="text-2xl  font-semibold">
         Today: {
           tasks.filter(task => {
             const today = new Date();
@@ -271,7 +270,6 @@ const getDateLabel = (dateStr: string) => {
       ))}
     </div>
   </div>
-</div>
     </>
   );
 }
