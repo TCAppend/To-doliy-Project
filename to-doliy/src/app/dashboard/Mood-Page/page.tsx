@@ -1,4 +1,5 @@
 'use client';
+import Tiptap from '@/app/components/Tiptap'
 
 interface JournalEntry {
   id: number;
@@ -55,7 +56,7 @@ export default function Mood_Page() {
           <h2 className="text-xl sm:text-2xl font-bold mb-4">Journal List:</h2>
           <ul className="space-y-2">
             {journals.map((journal) => (
-              <li key={journal.id} className="flex items-center gap-2">
+              <li key={journal.id} className="flex items-center gap-2 hover:underline" onClick={() => setActiveJournal(journal)}>
                 {editingJournalId === journal.id ? (
                   <input
                     type="text"
@@ -74,12 +75,6 @@ export default function Mood_Page() {
                 >
                   Edit
                 </button>
-                <button
-                  className="text-blue-500 hover:underline"
-                  onClick={() => setActiveJournal(journal)}
-                >
-                  Open
-                </button>
               </li>
             ))}
           </ul>
@@ -92,17 +87,15 @@ export default function Mood_Page() {
           </button>
         </div>
 
-        <div className="bg-[#FCFF58] col-span-3 p-4 rounded-2xl text-black">
+        <div className=" bg-[#FCFF58] col-span-3 p-4 rounded-2xl text-black">
           {activeJournal ? (
             <>
               <h3 className="font-bold text-2xl mb-4">
                 {activeJournal.dateCreated} {activeJournal.name}
               </h3>
-              <textarea
-                value={activeJournal.description}
-                onChange={(e) => updateJournal(activeJournal.id, 'description', e.target.value)}
-                placeholder="Write your thoughts here..."
-                className="bg-neutral-secondary-medium text-heading text-sm rounded-base block w-full h-64 p-5 shadow-xs resize-y"
+              <Tiptap
+                content={activeJournal.description}
+                onContentChange={(newContent) => updateJournal(activeJournal.id, 'description', newContent)}
               />
             </>
           ) : (
