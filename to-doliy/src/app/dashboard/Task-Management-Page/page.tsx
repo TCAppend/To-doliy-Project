@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { GoKebabHorizontal } from "react-icons/go";
 
+//Object structure for tasks
 interface Task {
   id: number;
   name: string;
@@ -12,9 +13,13 @@ interface Task {
   priority: 'Low' | 'Medium' | 'High';
 }
 
+//task management page with local storage persistence, task grouping by date, and priority sorting
 export default function Task_Management() {
+  // Stores all task
   const [tasks, setTasks] = useState<Task[]>([]);
+  //prevent local storage override on first load
   const [isLoaded, setIsLoaded] = useState(false);
+  
   const [newTask, setNewTask] = useState({
     name: '',
     description: '',

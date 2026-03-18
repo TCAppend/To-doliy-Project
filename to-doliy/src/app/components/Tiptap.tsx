@@ -36,6 +36,7 @@ const Tiptap = ({ content, onContentChange }: TiptapProps) => {
   onContentChange(editor.getHTML());
 },
 
+
   editorProps: {
     attributes: {
       class:
