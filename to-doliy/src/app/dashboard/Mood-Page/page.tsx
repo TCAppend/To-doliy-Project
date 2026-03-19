@@ -45,6 +45,8 @@ useEffect(() => {
   }
 }, []);
 
+
+
 // SAVE
 useEffect(() => {
   localStorage.setItem('journals', JSON.stringify(journals));

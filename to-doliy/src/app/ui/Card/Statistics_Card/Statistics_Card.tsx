@@ -1,3 +1,6 @@
+
+
+
 export default function Statistics_Card() {
     return (
         <div className="bg-[#F9D965] p-4 rounded-2xl">

@@ -1,3 +1,17 @@
+'use client';
+
+import Link from "next/link";
+import { useEffect, useState } from "react";
+
+interface Log {
+  id: number;             
+  name: string;           
+  description: string;    
+  startTime?: number;     // store as timestamp (ms)
+  endTime?: number;       
+  duration: number;       // total ms
+}
+
 export default function Short_Cut_Card() {
 
     return (
